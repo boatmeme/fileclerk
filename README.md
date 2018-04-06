@@ -2,8 +2,8 @@
 A node.js library for file and folder collation. Sort. Separate. Organize.
 
 [![npm version](https://badge.fury.io/js/fileclerk.svg)](https://badge.fury.io/js/fileclerk)
-[![Build Status](https://travis-ci.org/growombud/fileclerk.svg?branch=master)](https://travis-ci.org/growombud/fileclerk)
-[![codecov](https://codecov.io/gh/growombud/fileclerk/branch/master/graph/badge.svg)](https://codecov.io/gh/growombud/fileclerk)
+[![Build Status](https://travis-ci.org/boatmeme/fileclerk.svg?branch=master)](https://travis-ci.org/boatmeme/fileclerk)
+[![codecov](https://codecov.io/gh/boatmeme/fileclerk/branch/master/graph/badge.svg)](https://codecov.io/gh/boatmeme/fileclerk)
 
 ## Overview
 
