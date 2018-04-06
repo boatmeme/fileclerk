@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "ci-test": "npm run coverage && npm run lint && ./node_modules/.bin/codecov",
-    "coverage": "nyc report --reporter=lcov npm run test",
-    "test": "npm run mocha && npm run lint",
+    "coverage": "nyc --reporter=lcov --reporter=text-lcov npm test",
+    "test": "./node_modules/.bin/mocha ./test --recursive",
     "start": "node index.js",
-    "mocha": "./node_modules/.bin/mocha ./test --recursive",
     "lint": "./node_modules/.bin/eslint ."
   },
   "repository": {
