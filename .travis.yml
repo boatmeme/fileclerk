@@ -11,7 +11,7 @@ cache:
   directories:
     - node_modules
 script:
-- npm test
+- mkdir .nyc_output && npm run ci-test
 deploy:
   provider: npm
   email: jonathan.griggs@gmail.com
