@@ -4,6 +4,7 @@ A node.js library for file and folder collation. Sort. Separate. Organize.
 [![npm version](https://badge.fury.io/js/fileclerk.svg)](https://badge.fury.io/js/fileclerk)
 [![Build Status](https://travis-ci.org/boatmeme/fileclerk.svg?branch=master)](https://travis-ci.org/boatmeme/fileclerk)
 [![codecov](https://codecov.io/gh/boatmeme/fileclerk/branch/master/graph/badge.svg)](https://codecov.io/gh/boatmeme/fileclerk)
+[![Known Vulnerabilities](https://snyk.io/test/github/boatmeme/fileclerk/badge.svg?targetFile=package.json)](https://snyk.io/test/github/boatmeme/fileclerk?targetFile=package.json)
 
 ## Overview
 
@@ -13,7 +14,6 @@ More specifically, my family has media being synchronized, backed-up, copied fro
 
 I originally began writing it as a simple script that would run from a Docker container, but quickly realized the value of abstracting it out into a more general library. And here we are...
 
----
 ## Requirements
 
 Currently only works for >= Node.js v8
