@@ -14,6 +14,10 @@ More specifically, my family has media being synchronized, backed-up, copied fro
 I originally began writing it as a simple script that would run from a Docker container, but quickly realized the value of abstracting it out into a more general library. And here we are...
 
 ---
+## Requirements
+
+Currently only works for >= Node.js v8
+
 ## Install
 
 ```

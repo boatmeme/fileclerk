@@ -1,0 +1,23 @@
+language: node_js
+node_js:
+- node
+- '9'
+- '8'
+
+install:
+- yarn install
+cache:
+  yarn: true
+  directories:
+    - node_modules
+script:
+- npm test
+deploy:
+  provider: npm
+  email: jonathan.griggs@gmail.com
+  api_key:
+    secure: k2Jxw/wroc39phErD8GHVTN2qR3N8kQj+cazxB5m78X225v62Uc7ww9UJ9SIQbX7jo6LcnbpFPcGT9hIXrAeB/bqd+GMUXI3k3+BNZ+WUnH5zN9BpE9xkKhh2pUXlj9jwyMZNoZOFwkpdgYxDETy3+K5CJwrna5s8z363myF5z6dbHy5SNDX0bIsEGBqAww5qIUGPa1oWx/yFv6uN4juY6xQ6u/aLTFZlM+r+vOEFoIM4T7QTe1peLbCkXhwUrLWqEZqzue7MsTbQROPTjMCCUipj0IX+E7NslHfhbhyA+lW5JcMIlSQcuQrYhAj5KYU+RBTcerBgf6M7GFcEAOy46JQfwskMxRnenhjFsKy1EaoizoQdQdNHHq+N3JP+SbOwWt2SW7gMrrJeguf6dvJnUMDVStBooouNEgsCcxHIZH8xRB4C/GR1Yjq3HJT8Yg1qONDxYiR5KrIfL1Sh8AdybxyKnLhYmDqI7hLGUUr3kn1mN1M7jqmR1BZmJjU9dCM9Ygpaa43IdJlpHH4A2uJ4re6y75NvVUMTmTIxSnECDkL/zriK/ztGiJXHX1m0753Hc1scIYVrpqg3ErX+knyPQ1wM4s4jgQP5854Q3kJOY2553CFeIfBtXpW5mbVzIly/w0cUllgTAF+JY0CC61GeuoAXhGJeBpFsSqK+00I8/8=
+  on:
+    branch: master
+    tags: true
+    repo: boatmeme/fileclerk
