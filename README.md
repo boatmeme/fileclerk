@@ -23,33 +23,66 @@ npm install fileclerk
 ## Usage
 
 ```javascript
-const fc = require('fileclerk');
+const FileClerk = require('fileclerk');
 ```
 # API
 
-## sequence ( fnArray [, starting_results] )
-Returns a promise that resolves after all functions have been called sequentially
+## organize (sourcePath, targetPath [, options])
+Returns a promise that resolves with a list of files that were moved / copied during the process.
 
 ##### Use Case
-Resolving a sequential chain of *heterogeneous* asynchronous operations.
-
-Useful where different operations need to be performed on the same data, but order is critical and asynchronous calls should be limited to a concurrency of 1.
+Pull files out of a recursive directory structure - starting at the ```sourcePath``` - and move or copy them to a different directory structure starting at the ```targetPath```.
 
 ##### Example
 
-1. Persist to a Primary DB
-2. If successful, denormalize to a Secondary DB
-3. If successful, broadcast a message
+1. Files of many different types in an arbitrary-depth directory structure under a ```/INCOMING``` folder.
+2. Want to pull out all of the image files, move them to a new directory, and organize them by year, month, and full date (based on created date of source file).
+3. If any of the source directories below the ```sourcePath``` are empty after the operation, go ahead and delete those.
 
 ```
-const someData = { anyProperty: 'Rando' };
+const options = {
+  recursive: true,
+  cleanDirs: true,
+  extensions: ['jpg', 'png', 'tiff', 'gif'],
+  collateFn: (file) => {
+    const date = new Date(file.ctime);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
 
-Prolly.sequence( [ () => saveData( someData ),
-  () => denormalizeData( someData ),
-  () => broadcastMessage( someData ) ] );
+    // Return the path relative to targetPath
+    return `${year}/${month}/${year}-${month}-${day}/${file.filename}`;
+  }
+}
+
+const results = await FileClerk.organize(
+  '/INCOMING',
+  '/Pictures',
+  options,
+);
 ```
+
+## organizeByDate (sourcePath, targetPath[, options])
+Helper for organizing easily by date
+TODO: Document
+
+## organizeByExtension (sourcePath, targetPath[, options])
+Helper for organizing easily by file extension
+
+TODO: Document
+
+## organizeByAlphabetical (sourcePath, targetPath[, options])
+Helper for organizing easily by alphabetical order
+TODO: Document
 
 ---
+
+## TODO
+
+- Documentation.
+- Transpile to support earlier Node.js versions
+- Handle paths in a cross-platform way. Not sure how this library behaves on Windows devices, for instance.
+- General resiliency improvements for edge-cases and non-happy paths
 
 ## Contributing
 
