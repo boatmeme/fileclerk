@@ -1,6 +1,6 @@
 {
   "name": "fileclerk",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "File and Folder Collation for Node.js. Sort. Separate. Organize.",
   "main": "index.js",
   "scripts": {
