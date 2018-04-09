@@ -51,6 +51,103 @@ describe('FileClerkService', () => {
       newFiles.should.be.an.Array().of.length(4);
     });
 
+    it('should organize with list of includes regex strings', async () => {
+      const testDir = `${srcDir}/regextest`;
+      await FileService.createFile(`${testDir}/includes/01.mp4`);
+      await FileService.createFile(`${testDir}/includes/02.png`);
+      await FileService.createFile(`${testDir}/includes/03/04.jpg`);
+      await FileService.createFile(`${testDir}/other/includes/02.png`);
+      await FileService.createFile(`${testDir}/other/includes/shouldmatch/02.png`);
+
+      const opts = {
+        extensions: ['png', 'jpg'],
+        includes: ['^includes', 'shouldmatch'],
+      };
+      const files = await FileClerk.organize(testDir, targetDir, opts);
+      files.should.be.an.Array().of.length(3);
+      const remainingDirs = await FileService.listDirectoriesRecursive(testDir);
+      remainingDirs.should.be.an.Array().of.length(3);
+      const remainingFiles = await FileService.listFilesRecursive(testDir);
+      remainingFiles.should.be.an.Array().of.length(2);
+      const newDirs = await FileService.listDirectoriesRecursive(targetDir);
+      newDirs.should.be.an.Array().of.length(5);
+      const newFiles = await FileService.listFilesRecursive(targetDir);
+      newFiles.should.be.an.Array().of.length(3);
+    });
+
+    it('should organize with list of excludes regex strings', async () => {
+      const testDir = `${srcDir}/regextest`;
+      await FileService.createFile(`${testDir}/includes/01.mp4`);
+      await FileService.createFile(`${testDir}/includes/02.png`);
+      await FileService.createFile(`${testDir}/includes/excludes/04.jpg`);
+      await FileService.createFile(`${testDir}/includes/03.png`);
+      await FileService.createFile(`${testDir}/includes/shouldmatch/03.png`);
+
+      const opts = {
+        excludes: ['excludes', '03'],
+      };
+      const files = await FileClerk.organize(testDir, targetDir, opts);
+      files.should.be.an.Array().of.length(2);
+      const remainingDirs = await FileService.listDirectoriesRecursive(testDir);
+      remainingDirs.should.be.an.Array().of.length(3);
+      const remainingFiles = await FileService.listFilesRecursive(testDir);
+      remainingFiles.should.be.an.Array().of.length(3);
+      const newDirs = await FileService.listDirectoriesRecursive(targetDir);
+      newDirs.should.be.an.Array().of.length(1);
+      const newFiles = await FileService.listFilesRecursive(targetDir);
+      newFiles.should.be.an.Array().of.length(2);
+    });
+
+    it('should organize with list of includes and excludes regex strings', async () => {
+      const testDir = `${srcDir}/regextest`;
+      await FileService.createFile(`${testDir}/includes/01.mp4`);
+      await FileService.createFile(`${testDir}/includes/02.png`);
+      await FileService.createFile(`${testDir}/includes/excludes/04.jpg`);
+      await FileService.createFile(`${testDir}/other/includes/02.png`);
+      await FileService.createFile(`${testDir}/other/includes/shouldmatch/02.png`);
+
+      const opts = {
+        extensions: ['png', 'jpg', 'mp4'],
+        includes: ['^includes', 'shouldmatch'],
+        excludes: ['excludes', '02'],
+      };
+      const files = await FileClerk.organize(testDir, targetDir, opts);
+      files.should.be.an.Array().of.length(1);
+      const remainingDirs = await FileService.listDirectoriesRecursive(testDir);
+      remainingDirs.should.be.an.Array().of.length(5);
+      const remainingFiles = await FileService.listFilesRecursive(testDir);
+      remainingFiles.should.be.an.Array().of.length(4);
+      const newDirs = await FileService.listDirectoriesRecursive(targetDir);
+      newDirs.should.be.an.Array().of.length(1);
+      const newFiles = await FileService.listFilesRecursive(targetDir);
+      newFiles.should.be.an.Array().of.length(1);
+    });
+
+    it('should organize with list of includes and excludes RegExp objects', async () => {
+      const testDir = `${srcDir}/regextest`;
+      await FileService.createFile(`${testDir}/includes/01.mp4`);
+      await FileService.createFile(`${testDir}/includes/02.png`);
+      await FileService.createFile(`${testDir}/includes/excludes/04.jpg`);
+      await FileService.createFile(`${testDir}/other/includes/02.png`);
+      await FileService.createFile(`${testDir}/other/includes/shouldmatch/02.png`);
+
+      const opts = {
+        extensions: ['png', 'jpg', 'mp4'],
+        includes: [new RegExp('^includes'), new RegExp('shouldmatch')],
+        excludes: [new RegExp('excludes'), new RegExp('02')],
+      };
+      const files = await FileClerk.organize(testDir, targetDir, opts);
+      files.should.be.an.Array().of.length(1);
+      const remainingDirs = await FileService.listDirectoriesRecursive(testDir);
+      remainingDirs.should.be.an.Array().of.length(5);
+      const remainingFiles = await FileService.listFilesRecursive(testDir);
+      remainingFiles.should.be.an.Array().of.length(4);
+      const newDirs = await FileService.listDirectoriesRecursive(targetDir);
+      newDirs.should.be.an.Array().of.length(1);
+      const newFiles = await FileService.listFilesRecursive(targetDir);
+      newFiles.should.be.an.Array().of.length(1);
+    });
+
     it('should simulate organize w/dry run param', async () => {
       await FileService.createDirectory(targetDir);
       const opts = {
