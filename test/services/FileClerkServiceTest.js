@@ -249,9 +249,9 @@ describe('FileClerkService', () => {
       await FileService.deleteDirectory(targetDir);
     });
 
-    it('should organize by file extension', async () => {
+    it('should organize by file extension, irrespective of leading dot (.)', async () => {
       const opts = {
-        extensions: ['jpg', 'png', ''],
+        extensions: ['jpg', '.png', ''],
       };
       const files = await FileClerk.organizeByExtension(srcDir, targetDir, opts);
       files.should.be.an.Array().of.length(6);
