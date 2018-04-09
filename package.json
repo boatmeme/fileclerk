@@ -1,6 +1,6 @@
 {
   "name": "fileclerk",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "File and Folder Collation for Node.js. Sort. Separate. Organize.",
   "main": "index.js",
   "scripts": {
@@ -41,10 +41,14 @@
   "dependencies": {
     "fs-extra": "^5.0.0",
     "lodash.compact": "^3.0.1",
+    "lodash.every": "^4.6.0",
     "lodash.flatten": "^4.4.0",
     "lodash.groupby": "^4.6.0",
     "lodash.isempty": "^4.4.0",
+    "lodash.isfunction": "^3.0.9",
+    "lodash.isregexp": "^4.0.1",
     "lodash.orderby": "^4.6.0",
+    "lodash.some": "^4.6.0",
     "moment": "^2.22.0",
     "prolly": "^0.3.0",
     "uuid": "^3.2.1"
