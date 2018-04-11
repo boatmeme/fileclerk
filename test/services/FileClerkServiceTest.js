@@ -319,9 +319,9 @@ describe('FileClerkService', () => {
       await FileService.createDirectory(`${srcDir}/03/sub/donotfind.dir`);
       await FileService.createFile(`${srcDir}/05/06/a.rose.by.any.other.name`);
       await FileService.createFile(`${srcDir}/05/06/no_extension`);
-      await FileService.createFile(`${srcDir}/05/06/07.png`);
+      await FileService.createFile(`${srcDir}/05/06/07.PNG`);
       await FileService.createFile(`${srcDir}/05/06/07.jpg`);
-      await FileService.createFile(`${srcDir}/05/07/10.mp4`);
+      await FileService.createFile(`${srcDir}/05/07/10.MP4`);
       await FileService.createDirectory(`${srcDir}/05/08/09`);
       await FileService.createFile(`${srcDir}/png/1`);
       await FileService.createFile(`${srcDir}/png/1.arf`);
@@ -348,7 +348,7 @@ describe('FileClerkService', () => {
 
     it('should organize by file extension, and filter on extensions irrespective of leading dot (.)', async () => {
       const opts = {
-        extensions: ['jpg', '.png', ''],
+        extensions: ['JPG', '.png', ''],
       };
       const files = await FileClerk.organizeByExtension(srcDir, targetDir, opts);
       files.should.be.an.Array().of.length(6);
