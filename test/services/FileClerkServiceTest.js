@@ -1,4 +1,6 @@
-require('should');
+const should = require('should');
+const moment = require('moment');
+const { wait } = require('prolly');
 const FileService = require('../../lib/services/FileService');
 const FileClerk = require('../../lib/services/FileClerkService');
 
@@ -261,6 +263,9 @@ describe('FileClerkService', () => {
     });
 
     it('should organize by creation date (no params)', async () => {
+      const now = moment();
+      const resultPathShouldContain = ['YYYY-MM-DD'].map(f => now.format(f)).join('/');
+
       const files = await FileClerk.organizeByDate(srcDir, targetDir);
       files.should.be.an.Array().of.length(10);
       const remainingDirs = await FileService.listDirectoriesRecursive(srcDir);
@@ -271,12 +276,18 @@ describe('FileClerkService', () => {
       newDirs.should.be.an.Array().of.length(1);
       const newFiles = await FileService.listFilesRecursive(targetDir);
       newFiles.should.be.an.Array().of.length(10);
+      newFiles.forEach(({ path, filename }) => {
+        should((new RegExp(`^${targetDir}/${resultPathShouldContain}/${filename}$`)).test(path)).be.true();
+      });
     });
 
     it('should organize by creation date (default format) w/extensions', async () => {
       const opts = {
         extensions: ['jpg', 'png'],
       };
+      const now = moment();
+      const resultPathShouldContain = ['YYYY-MM-DD'].map(f => now.format(f)).join('/');
+
       const files = await FileClerk.organizeByDate(srcDir, targetDir, opts);
       files.should.be.an.Array().of.length(4);
       const remainingDirs = await FileService.listDirectoriesRecursive(srcDir);
@@ -287,6 +298,9 @@ describe('FileClerkService', () => {
       newDirs.should.be.an.Array().of.length(1);
       const newFiles = await FileService.listFilesRecursive(targetDir);
       newFiles.should.be.an.Array().of.length(4);
+      newFiles.forEach(({ path, filename }) => {
+        should((new RegExp(`^${targetDir}/${resultPathShouldContain}/${filename}$`)).test(path)).be.true();
+      });
     });
 
     it('should organize by creation date (custom formats)', async () => {
@@ -294,6 +308,9 @@ describe('FileClerkService', () => {
         extensions: ['jpg', 'png'],
         dateFormat: ['YYYY', 'YYYY-MM', 'YYYY-MM-DD'],
       };
+      const now = moment();
+      const resultPathShouldContain = opts.dateFormat.map(f => now.format(f)).join('/');
+
       const files = await FileClerk.organizeByDate(srcDir, targetDir, opts);
       files.should.be.an.Array().of.length(4);
       const remainingDirs = await FileService.listDirectoriesRecursive(srcDir);
@@ -304,6 +321,90 @@ describe('FileClerkService', () => {
       newDirs.should.be.an.Array().of.length(3);
       const newFiles = await FileService.listFilesRecursive(targetDir);
       newFiles.should.be.an.Array().of.length(4);
+      newFiles.forEach(({ path, filename }) => {
+        should((new RegExp(`^${targetDir}/${resultPathShouldContain}/${filename}$`)).test(path)).be.true();
+      });
+    });
+
+    it('should organize by creation date (default to use earliest of all File.stats dates)', async () => {
+      const opts = {
+        extensions: ['jpg', 'png'],
+        dateFormat: ['YYYY-MM-DDTHH:mm:ss.SSSZ'],
+      };
+      const filename = 'mytest.jpg';
+      const tsSourceDir = `${srcDir}/timestamp-src`;
+      const tsTargetDir = `${srcDir}/timestamp-target`;
+      const srcFile = `${tsSourceDir}/${filename}`;
+
+      const startTime = moment().valueOf();
+      await wait(10);
+
+      await FileService.createFile(srcFile);
+
+      await wait(10);
+
+      const [{ target: middleTarget }] =
+        await FileClerk.organizeByDate(tsSourceDir, tsTargetDir, opts);
+      const { ctime: middleCtime } = await FileService.stat(middleTarget);
+      const m1 = middleTarget.match(new RegExp(`([^/]*)/${filename}$`));
+      const middleTargetDirTime = moment(m1[1]).valueOf();
+
+      await wait(10);
+
+      const [{ target: lastTarget }]
+        = await FileClerk.organizeByDate(tsTargetDir, tsSourceDir, opts);
+      const { ctime: latestCtime } = await FileService.stat(lastTarget);
+      const m2 = lastTarget.match(new RegExp(`([^/]*)/${filename}$`));
+
+      const latestTargetDirTime = moment(m2[1]).valueOf();
+      const middleCTime = moment(middleCtime).valueOf();
+      const latestCTime = moment(latestCtime).valueOf();
+
+      latestTargetDirTime.should.be.eql(middleTargetDirTime);
+      latestTargetDirTime.should.be.lessThan(latestCTime);
+      latestTargetDirTime.should.be.lessThan(middleCTime);
+      latestTargetDirTime.should.be.greaterThan(startTime);
+    });
+
+    it('should organize by creation date (client-defined date property)', async () => {
+      const opts = {
+        extensions: ['jpg', 'png'],
+        dateFormat: ['YYYY-MM-DDTHH:mm:ss.SSSZ'],
+        dateProperty: 'ctime',
+      };
+      const filename = 'mytest.jpg';
+      const tsSourceDir = `${srcDir}/timestamp-src`;
+      const tsTargetDir = `${srcDir}/timestamp-target`;
+      const srcFile = `${tsSourceDir}/${filename}`;
+
+      const startTime = moment().valueOf();
+      await wait(10);
+
+      await FileService.createFile(srcFile);
+
+      await wait(10);
+
+      const [{ target: middleTarget }] =
+        await FileClerk.organizeByDate(tsSourceDir, tsTargetDir, opts);
+      const { ctime: middleCtime } = await FileService.stat(middleTarget);
+      const m1 = middleTarget.match(new RegExp(`([^/]*)/${filename}$`));
+      const middleTargetDirTime = moment(m1[1]).valueOf();
+
+      await wait(10);
+
+      const [{ target: lastTarget }]
+        = await FileClerk.organizeByDate(tsTargetDir, tsSourceDir, opts);
+      const { ctime: latestCtime } = await FileService.stat(lastTarget);
+      const m2 = lastTarget.match(new RegExp(`([^/]*)/${filename}$`));
+
+      const latestTargetDirTime = moment(m2[1]).valueOf();
+      const middleCTime = moment(middleCtime).valueOf();
+      const latestCTime = moment(latestCtime).valueOf();
+
+      latestTargetDirTime.should.be.greaterThan(middleTargetDirTime);
+      latestTargetDirTime.should.be.lessThan(latestCTime);
+      latestTargetDirTime.should.be.eql(middleCTime);
+      latestTargetDirTime.should.be.greaterThan(startTime);
     });
   });
 
