@@ -1,5 +1,5 @@
 const should = require('should');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const { wait } = require('prolly');
 const FileService = require('../../lib/services/FileService');
 const FileClerk = require('../../lib/services/FileClerkService');
@@ -364,6 +364,25 @@ describe('FileClerkService', () => {
       latestTargetDirTime.should.be.lessThan(latestCTime);
       latestTargetDirTime.should.be.lessThan(middleCTime);
       latestTargetDirTime.should.be.greaterThan(startTime);
+    });
+
+    it('should organize by creation date (client-defined timezone)', async () => {
+      const tzStr = 'Antarctica/South_Pole';
+      const timezone = moment.tz(tzStr).format('Z');
+      const opts = {
+        extensions: ['jpg', 'png'],
+        dateFormat: ['Z'],
+        timeZone: tzStr,
+      };
+      const filename = 'mytest.jpg';
+      const tsSourceDir = `${srcDir}/timestamp-src`;
+      const tsTargetDir = `${srcDir}/timestamp-target`;
+      const srcFile = `${tsSourceDir}/${filename}`;
+
+      await FileService.createFile(srcFile);
+      const [{ target }] = await FileClerk.organizeByDate(tsSourceDir, tsTargetDir, opts);
+      const tzMatch = target.match(new RegExp(`([^/]*)/${filename}$`));
+      tzMatch[1].should.be.a.String().eql(timezone);
     });
 
     it('should organize by creation date (client-defined date property)', async () => {
