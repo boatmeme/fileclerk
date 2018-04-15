@@ -1,4 +1,4 @@
-require('should');
+const should = require('should');
 const FileService = require('../../lib/services/FileService');
 
 describe('FileService', () => {
@@ -9,6 +9,39 @@ describe('FileService', () => {
   });
   after(async () => {
     await FileService.deleteDirectory(home);
+  });
+
+  describe('stat', () => {
+    const localDir = `${home}/listdirs`;
+    before(async () => {
+      await FileService.createFile(`${localDir}/01.mp4`);
+      await FileService.createFile(`${localDir}/02.png`);
+      await FileService.createDirectory(`${localDir}/03`);
+    });
+    after(async () => {
+      await FileService.deleteDirectory(`${localDir}`);
+    });
+
+    it('should stat a directory at a specified path', async () => {
+      const stat = await FileService.stat(localDir);
+      stat.should.be.an.Object();
+      stat.should.have.property('path').is.a.String().eql(localDir);
+      stat.should.have.property('isDirectory').is.a.Boolean().is.true();
+    });
+
+    it('should stat a file at a specified path', async () => {
+      const path = `${localDir}/02.png`;
+      const stat = await FileService.stat(path);
+      stat.should.be.an.Object();
+      stat.should.have.property('path').is.a.String().eql(path);
+      stat.should.have.property('isDirectory').is.a.Boolean().is.false();
+    });
+
+    it('should return null for a non-existent path', async () => {
+      const path = `${localDir}/dir-${Date.now()}`;
+      const stat = await FileService.stat(path);
+      should(stat).be.Null();
+    });
   });
 
   describe('listDirectories', () => {
@@ -41,6 +74,39 @@ describe('FileService', () => {
       await Promise.all(dirArr.map(d => FileService.createDirectory(d)));
       const dirs = await FileService.listDirectories(`${localDir}/create`);
       dirs.should.be.an.Array().of.length(3);
+    });
+  });
+
+  describe('listFilesAndDirectories', () => {
+    const localDir = `${home}/listfiles`;
+    before(async () => {
+      await FileService.createFile(`${localDir}/01.mp4`);
+      await FileService.createFile(`${localDir}/02.png`);
+      await FileService.createFile(`${localDir}/03/04.png`);
+      await FileService.createFile(`${localDir}/05/06/07.png`);
+    });
+    after(async () => {
+      await FileService.deleteDirectory(`${localDir}`);
+    });
+    it('should list files and Directories at the specified path (recursive)', async () => {
+      const files = await FileService.listFilesAndDirectories(`${localDir}`);
+      files.should.be.an.Array().of.length(4);
+    });
+
+    it('should list files and Directories at the specified path (recursive)', async () => {
+      const files = await FileService.listFilesAndDirectories(`${localDir}`, { recursive: true });
+      files.should.be.an.Array().of.length(7);
+    });
+
+    it('should throw an error if passed a file', async () => {
+      const path = `${localDir}/01.mp4`;
+      try {
+        await FileService.listFilesAndDirectories(path);
+        should(false).be.true();
+      } catch (err) {
+        err.should.be.Error();
+        err.should.have.property('message').is.a.String().eql(`${path} is not a directory`);
+      }
     });
   });
 
